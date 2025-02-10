@@ -1,0 +1,17 @@
+global:
+  evaluation_interval: 15s
+
+otlp:
+  promote_resource_attributes:
+    - service.instance.id
+    - service.name
+    - service.namespace
+    - cloud.availability_zone
+    - cloud.region
+    - container.name
+    - deployment.environment.name
+  translation_strategy: NoUTF8EscapingWithSuffixes
+
+storage:
+  tsdb:
+    out_of_order_time_window: 30m

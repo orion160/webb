@@ -1,0 +1,38 @@
+services:
+  otel-collector:
+    image: otel/opentelemetry-collector:0.119.0
+    volumes:
+    - ./otel-collector-config.yaml:/etc/otelcol/config.yaml:ro,Z
+    ports:
+      - 4317 # OTLP gRPC receiver
+      - 4318 # OTLP http receiver
+  jaeger:
+    image: jaegertracing/jaeger:2.3.0
+    ports:
+      - 16686:16686 # UI
+      - 4317 # OTLP gRPC
+      - 4318 # OTLP HTTP JSON/Protobuf
+    depends_on:
+      - otel-collector
+  prometheus:
+    image: prom/prometheus:v3.1.0
+    command:
+     - --config.file=/etc/prometheus/prometheus.yml
+     - --storage.tsdb.path=/prometheus
+     - --web.enable-otlp-receiver
+    volumes:
+    - ./prometheus-otlp.yml:/etc/prometheus/prometheus.yml:ro,Z
+    ports:
+      - 9090:9090
+  grafana:
+    image: grafana/grafana:11.5.1
+    ports:
+      - 3000:3000
+    depends_on:
+      - prometheus
+  nginx:
+    image: nginx:1.27.4-otel
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro,Z
+    ports:
+      - 8080:80
