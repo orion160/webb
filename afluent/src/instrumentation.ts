@@ -54,6 +54,7 @@ const otelSDK = new NodeSDK({
   textMapPropagator: propagator,
   autoDetectResources: true,
   resourceDetectors: [envDetector, hostDetector, processDetector, osDetector],
+  serviceName: 'afluent:nestjs',
 })
 
 export default otelSDK
